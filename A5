@@ -1,0 +1,197 @@
+[6] 1. Let A[1 . . . n] be an array of n distinct integers. A set S ⊆ {1, . . . , n} is called an ultraincreasing subsequence if 
+A[i] < A[j] for all j ∈ S and all i ∈ {1, . . . , n} with i < j 
+
+Here is an algorithm that computes an ultra-increasing subsequence. The function Top(S) returns the top element of the stack without removing it from the stack. 
+
+Algorithm: UltraIncrSubseq 
+let S be an empty stack 
+for i from 1 to n do 
+while S is not empty and A[i] > A[Top(S)] do 
+Pop(S) 
+end 
+Push(S, i) 
+end 
+Return S 
+
+Use amortized analysis to analyze the runtime of UltraIncrSubseq as a function of n? Hint: the runtime is o(n^2 ).
+
+PHI(D0) = 0
+Let potential function be PHI(Di) = |S|, 		
+
+Let t = # of times algorithm iterates thru while-loop
+ 	Real Cost of iteration: t + theta(1)
+	Potential decreases by t, then increases by n
+	So potential difference is PHI(i) - PHI(i-1) = 1-t
+ n-t
+So amortized cost is t + theta(1)+ (1-t), which is within theta(1)
+
+The for-loop iterates n times, 
+Thus the algorithm will be within O(n)
+
+t + theta(1) + n - t 
+	The amortized cost is within O(n)
+
+O(3n)
+
+
+
+[10] 2. A multistack consists of a (potentially infinite) series of stacks S0, . . . , St−1 
+where the j th stack Sj can hold up to 3^j elements. 
+Whenever a user attempts to push an element onto a full stack Sj , we first pop all the elements off Sj and push them onto stack Sj+1 to make room. 
+
+Thus, if Sj+1 is already full, we first recursively move all its members to Sj+2. 
+
+Moving a single element from one stack to the next takes O(1) time. 
+
+For instance, here is how we would insert a new element into a multistack that already contains 22 elements:
+
+PHI(Di) = 2*sum_j=0 to (t-1) {Nelemns_i (Sj)(log3(n0j) 	}
+
+[2] a. In the worst case, how long does it take to push one more element onto a multistack containing n elements?
+
+	(All stacks are full, we have to move them all)
+
+	# of elements in n:	 3^0 + 3^1 + 3^2 + … 3^(t-1) 
+	Every element is popped AND pushed onto next larger stack
+Therefore, worst case = O(2n) = O(n)
+
+[8] b. Prove that the amortized cost of a sequence of n push operation on an initially empty multistack is in O(n log n), where n is the maximum number of elements in the multistack. Hints:
+
+• Use Φ(Di) = 2* sum_j=0 to (t−1) { Nelems_i (Sj ) (log3 n − j) }
+where Nelems_i(Sj ) is the number of elements stack Sj contains in Di . 
+
+• Start by computing the amortized cost of moving the elements of a full stack onto the next stack.
+PUSHALL = move + move + … + push
+costAm(PUSHALL) = costAm(move) + .. + costAm(push)	if j = 0
+
+costAm(move) = DeltaPhi(move) + real(move)
+	= DeltaPhi(pops) + DeltaPhi(pushes) + real(pops) + real(pushes)
+
+costAm(push) is within log3(n)
+costReal(move) = 2*3^j
+	j-> j+1
+
+Total Sum: 2* sum_all of j * log3(n)-j + 2*3^j  
+DeltaPhi(pops) = 2 * nelems(j) * log3(n)-j 		-> before: 3^i, 	after: 0		-> -(3^i)
+	= -2*3^j (log3(n) - j) 
+
+DeltaPhi(pushes) = 2 *3^j * log3(n) -(j+1 )	
+
+
+
+costAm(move) = DeltaPhi(pushes) + DeltaPhi(pops)  +  costReal(move)
+		= {  2 *3^j * log3(n) - (j+1 )	}
+{ -2*3^j * (log3(n) - j 	} 
++ 2*3^j	
+		 = 0
+		= (Whatever it is) will be within theta(1)
+
+(Moves only happen on 3^i )
+
+Let t = # of stacks
+
+Therefore, 
+costAm(PUSH) = costAm(move) + .. + costAm(push)
+costAm(PUSH) = t * theta(1)  + costAm(push)
+costAm(PUSH) = t  + O(log3(n) )	
+
+Therefore costAm(PUSH) is within O(log(n) )	
+There are n pushes overall, 
+so overall, n* O(log(n) ) = O(n* log(n) )
+
+
+[10] 3. A problem with Bloom filters is that you cannot delete elements from a Bloom filter by changing the corresponding 1s to 0s. Counting Bloom filters are a variation of Bloom filters where you do not use an array of bits, but an array of small counters. Instead of changing 0s to 1s when an element hashes to a Bloom filter location, you increment the counter. To delete an element, you decrement the counter. To check if an element is in the set, you just check if all of the counter entries are bigger than 0; if they are, then you return the element is in the set. If you see a 0, you say that the element is not in the set. 
+
+[2] a. Explain, by giving an example, why deletions will not work properly with a standard Bloom filter if you change 1s back to 0s on a deletion
+There could be more items hashed to one spot.
+So if one element is deleted from any spot, 
+Others could be deleted as well.
+
+Afterwards, if we try to retrieve any one item from a hash with particularly deleted items, 
+We could have a false negative: the function will say that it’s not there - but however it, in fact, is. 
+
+
+[6] b. Deletions will work properly for a Counting Bloom filter as long as the counters never overflow; once a counter overflows, you would not have an accurate count of the number of elements currently hashed to that location. A standard choice in this setting in practice to use 4 bit counters. 
+
+Find an expression for the probability that a specific counter overflows when using 4 bit counters when n elements are hashed into m total locations using k hash functions. (You may have a summation in your expression.) 
+	
+If k=2
+0		m
+	[	][	]
+	 h1(.)	   h2(.)
+
+	Each has size m/k
+	
+	[[]		]
+
+(4 bits)
+2^4 -1 = 15	(16 or more increments = overflow)
+
+Prob(1st counter gets incremented by 1 item) = 1 / size = k/m
+Prob(counter gets incremented 16 or more times by n items
+
+
+f(n, k, p) = Prob(counter gest incr. By exactly k times by n items)
+By Binomial Distribution
+
+    n events
+,----------’-------,
+[ ] [ ] [ ] [ ] … [ ] 
+
+If we want k events to happen:
+p^k			(where p is prob of a single event happening)
+(1-p)^(n-k)		# events that didnt happen
+			
+
+f(n, k, p) = p^k * (1-p)^(n-k)	
+		Let p = 1/size = k/m
+f(n, i, p) = (n choose i) (k/m)^i * (1-(k/m))^(n-i)		
+
+		
+Now we want Prob(counter gets incr. By at least 16 times by n items)
+	= Prob(incr. By 16) + prob(incr. By 17) + …. prob(incr. By n)
+	CASE: i = 16
+		= (n choose 16) (k/m)^16 * (1-(k/m))^(n-16)
+	CASE: i = 17
+		= (n choose 17) (k/m)^17 * (1-(k/m))^(n-17)
+	…
+	CASE: i = n
+		= (n choose n) (k/m)^n * (1-(k/m))^(n-n)  	= (n choose n) (k/m)^n 
+
+	Overall: 
+	Sum_i = 16 to n {   (n choose k) (k/m)^i * (1-(k/m))^(n-i)   }
+
+[2] c. Suppose that you use m counters for n elements and k hash functions for a Counting Bloom filter. What is the false positive probability (assuming there has never been an overflow), and how does it compare with the standard Bloom filter?
+False positive case: 
+when isValid returns true but there is no item in that particular cache
+	
+	Let m = #of bins 
+	Let B = m/k
+
+fraction of empty bins = e^(-n/B)
+= e^(-n/(m/k))
+Pr(one false positive) = 1-e^(-nk/m)
+Pr(k false positives) = (1-e^(-nk/m) )^k
+
+
+[5] d. OPTIONAL BONUS: Let us consider again the overflow probability computed in part (b) of this question. Suppose we fix k = (m/n) · ln(2), a standard number of hash functions for a Bloom filter. 
+
+In this question, we will compute an actual numerical upper bound on the overflow probability. To do so, you should use a theorem called the Chernoff bound. 
+
+This theorem states that, for a random variable X with the binomial distribution with parameters n and p (hence with mean µ = np), for any δ > 0
+
+
+	Mu = np = nk/m
+
+	Mu  = nk/m = n(m/n*ln(2) ) / m = ln(2)
+	
+	From 3b, (1 + delt)mu = 16
+
+(1 + delt) ln(2) = 16
+Delt = [ 16/ ln(2) ] -1
+	= 22.083...
+		
+
+	-> e^22.083… / (1+ 22.083... ) ^ (1+ 22.083... ) 
+	-> 1.32 * 10^-22
+		
