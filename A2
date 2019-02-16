@@ -1,0 +1,238 @@
+[10] 1. Let us consider how cycles, connectivity and searching works in directed graphs. 
+A path in a directed graph is much the same as in an undirected graph, except that all edges must be pointed in the same direction. So, a path is a sequence of vertices v1; : : : ; vk such that v1; : : : ; vk are distinct vertices, and (vi; vi+1) is a directed edge for every i.
+A cycle in a directed graph is much the same as in an undirected graph, except that all
+edges must be pointed in the same direction. So, a cycle is a sequence of vertices v1; : : : ; vk such that v1; : : : ; vk􀀀1 are distinct vertices, v1 = vk, and (vi; vi+1) is a directed edge for every i.
+A directed graph is called strongly connected if, for every ordered pair of vertices u and v, there is a directed path from u to v. (So there must be one from v to u as well.)
+Breadth-first search (BFS) in a directed graph works much like BFS in an undirected graph, except that edges must be followed in the right direction: from their tail towards their head.
+
+[5] (a) Prove or disprove: In a directed graph with n >= 2 nodes, if BFS run from two
+different nodes reaches n nodes both times, then this directed graph has a directed
+Cycle.
+PROVE:
+If BFS is run on any graph with n >= 2 nodes, and it reaches n nodes, then there must have been directed paths that lead to all n nodes.
+If there are NO nodes that appear twice, the graph will be as so:
+			(n0) --> (n1) 
+			   ^---------’
+	Note that there can be any other nodes in between n0 and n1
+	If there are nodes that appear twice,  the graph will be as so:
+				   v---------,
+			(n0) --> (n1) -> (n2)
+			   ^---------’
+Therefore, there is a directed cycle.
+	
+[5] (b) Prove or disprove: In a directed graph with n >= 2 nodes, if BFS run from two
+different nodes reaches n nodes both times, then this directed graph is strongly
+connected.	
+	DISPROVE:
+This graph has n >= 2 nodes:
+			(n0) --> (n1) -------> (n2)
+			   ^---------’’---------->(n3)
+
+If BFS is run on nodes n0 and n1, BFS will reach 3 different nodes both times (n0 -> n1 -> n2 or n3), (n1 -> n0 -> n2 or n3). However this graph is NOT strongly connected because there are no directed paths between n2 and n3 
+	
+
+
+
+
+
+[15] 2. A small photocopying service with a single large machine faces the following scheduling problem. Each morning they get a set of jobs from customers. They want to do the jobs on their single machine in an order that keeps their customers happiest. Customer i's job will take ti seconds to complete. Given a schedule (i.e., an ordering of the jobs), let Ci denote the finishing time of job i. For instance, if job j is the first to be done, then Cj = tj ; and if job j is done right after job i then Cj = Ci + tj .
+
+Each customer i also has a weight wi that represents his or her importance to the business. The happiness of customer i is expected to be dependent on the finishing time of i's job. So the company decides that they want to order the jobs to minimize the weighted sum of the completion times:
+
+
+Sum[i=1 to N]( W[i] C[i] )
+
+For example: suppose there are two jobs. The first job takes times t1 = 3 and has weight
+w1 = 12, while the second job takes time t2 = 1 and has weight w2 = 3. 
+Then doing job 1 first would yield a weighted completion time of 12 * 3 + 3 * 4 = 48. 
+Doing job 2 first would yield a weighted completion time of 3* 1 + 12 * 4 = 51.
+	w1*c1:t1 + w2+c2:c1+t2 = 48
+	w2*c2:t2 + w1+c1:c2+t1 = 51
+
+
+	I.e.
+	T2 = 3		w2 = 10 	c2 = 3
+	T1 = 5		w2 = 2		c1 = 8		-> wi*ci	 + w2*c2 - ->	2*8+10*3
+
+
+[5] a. Design an efficient algorithm to solve this problem. That is, you are given a set of n
+jobs with a processing time ti and a weight wi for each job, and you want to order
+the jobs so as to minimize the weighted sum of the completion times. 
+Hint: the algorithm can be described in one line.
+
+	Let S = set of jobs: { 1, 2, … n}
+	Let ti = time for job i
+Let wi = weight for job i
+
+The finish times for each job i are: 
+i=1: c1 = t1
+i=2: c2 = c1 + t2
+…
+therefore, for each job i: 	ci = c(i-1) + ti
+
+From the example, we compared doing job1->job2 and job2->job1. 
+A higher weight associated with a higher completion time leads to a longer completion time. Therefore, we want to prioritize higher weights first. 
+
+Completion time increases with jobs after the 1st.  
+Given equal weights, we want to prioritize shorter job times. 
+
+Therefore, we want a minimal ratio of weight and completion time as the 1st few jobs. 
+
+So: 
+	- sort each job i in S, by wi/ti, max to min
+========================
+
+[10] b. Prove the correctness of your algorithm from part (a). Hint: what happens to the
+weighted completion time if you swap the first out-of-order job with the previous
+One?
+	So we have a solution, sorted by algorithm in 2a.
+	Any solution that isn’t sorted by this algorithm isn’t optimal
+	
+	PROOF BY EXCHANGE ARGUMENT: 
+	Let i & j = two adjacent jobs
+	In an optimized order, the jobs are set as so: 
+[ 1st set of jobs]  	[i ]  [ j	    ] 	[rest of jobs]
+
+
+
+
+
+
+
+And wi/ti < wj/tj
+
+
+Suppose there is another job ordering, unoptimized, with jobs i & j swapped:
+[ 1st set of jobs] //// [ j’		][i’] // [rest of jobs]
+				|   |
+	|    ci
+		Cj
+
+	
+	So wj’/tj’	wi’/ti’
+
+	Optimality is defined by the weighted completion time. 
+	** If we swap j & i back to its original order, we gain optimality. 
+
+	Let S’ = alternate ordering, before swap
+	S’ = (everything before) + wj*cj’ + wi*ci’ + (the rest)
+	
+The cost for jobs i’ & j’ are as follows:
+Cj’ = T + tj 
+Ci’ = T + tj + ti
+
+	If optimized & ordered, the costs for jobs i & j are as follows:
+Ci = T + ti
+Cj = T + ti + tj
+
+If compared by calculations, the weights would be: 
+wi*ci + wj*cj < Wi’*Ci’ + wj’*cj’
+wi*( T + ti ) + wj( T + ti + tj ) < Wi’* ( T + tj’ +ti’ ) + wj’* ( T + j’i ) 
+wi*tj < wj’/ti’
+wi/ti < wj’/tj’
+
+	In this case, the true optimal solution would have job i before job j, 
+And our algorithm would have this ordering. 
+
+
+
+[15] 3. This problem is related to the interval scheduling problem that was discussed in the lectures.
+Suppose that, instead of being a would-be attendee, you are now the person in charge of
+providing security for these events. To simplify the problem, let us assume that one guard
+is needed for each event. A guard can of course provide security at multiple events as long
+as they do not overlap. The cost of providing security will be computed as follows:
+
+> There is a fixed cost c to hire a guard.
+>There is a per-hour cost paid to provide security at each event.
+
+Since the sum of the lengths of the events is xed, the only control you have over the total
+cost is through the number of guards you hire. To minimize the total cost, you thus want
+to hire as few guards as possible.
+
+(only hiring cost is important; hire as less guards as possible)
+
+
+	|------|    |---------|
+	     |---------|
+
+
+[3] (a) One of your friends suggests using the following algorithm to assign guards to events:
+			while there are events left do
+hire a guard g
+find a largest set E of non-overlapping events
+	assign g to guard the events in E
+end
+	(Hint: At 2nd iteration, we’re done)
+where the set E is found using the algorithm discussed in class. Prove that this
+algorithm does not always return a minimal set of guards.
+
+The flaw in this algorithm is that, once it selects the first event for a given guard, it will only select the next event that won’t overlap the already chosen events
+	|---a----|    	|----c-----|
+		       |---b----|	
+	 	 |------------d-----------|
+	Let S be a set of events with times scheduled as above, in the order a, b, c, d
+	The 1st guard iterated would have been scheduled event a, then c ( event c would be the first event encountered within in the set that doesn’t overlap event a
+	The 2nd guard iterated would have event b	
+	The 3rd guard iterated would have event d 
+	Overall, in this case, the algorithm can generate 3 guards as a minimum.
+
+	However, in this case, we can manually assign it with 2 guards:
+	1st Guard: a & d	2nd Guard: b & c
+
+	The algorithm has a case in which it did NOT return the minimum set of guards 
+
+[7] (b) Describe an algorithm that finds a minimal set of guards and runs in o(n2) time.
+	(We need to find up to k guards, where k = # of guards)
+
+	Algorithm: 
+	Let ei = some event i
+	Let s(ei) & f(ei) = respective start & end times for event i
+	Let G = set of guards, init to empty
+	Let Gf = set of guards overall that are free, subset of G, init to empty
+
+	Sort all s(ei) and f(ei), from smallest to largest
+	If there’s a s(e) & f(e) that are the same time, place f(e) before s(e)	
+	Let x be either an s(e) or f(e) in the set
+	ForEach x do:
+		If x is a f(e) then: 
+			Get event’s guard & set to Gf
+		Else:
+			If Gf is empty then: 
+				Hire a new Guard & add to Gf
+			Assign guard from Gf to event corresponding to s(e)
+			Move said guard from Gf to G
+	
+
+[2] (c) Analyze the worst-case running time of your algorithm from part (b).
+	Let n = # of events in the set
+	On average, most sorting algorithms take O(n*log(n) ). 
+(If there’s by any chance a faster sorting algorithm, we take it too)
+
+	ForLoop iterates 2n times (one for each start & end time)
+	Overall, algorithm runs in at least O(n*log(n) ) 
+	Algorithm is still in O(n^2) anyway.
+
+
+
+[3] (d) Prove that your algorithm hires the fewest number of guards possible. Hint: the
+proof should be short.
+	
+	Let x = # of guards hired
+	
+	BASE CASES:
+	Suppose 2 events in the set
+	If they overlap, the algorithm uses 2 guards. Would be unnecessary to use more.  
+	If they don’t overlap, the algorithm uses 1 guard. Would be unnecessary to use more. 
+
+	INDUCTION STEP: 
+	Suppose n events in the set. 
+	If no events overlap at all, the algorithm uses 1 guard.
+	If all events overlap, the algorithm uses n guards. 
+	Otherwise, let n0 = highest # of overlapping events at any one time. 
+Without any free guards to assign an event, the algorithm will add a new guard & assign the event to him/her. (otherwise, there’s a free guard for the event)
+At most, the algorithm will hire n0 guards, which will still be the fewest guards possible. 
+
+
+
+
+
