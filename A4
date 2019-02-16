@@ -1,0 +1,114 @@
+[15] 1. After the end of term 2, a student decides to ride her bicycle from Vancouver to Halifax. She starts on the road at kilometer 0. 
+Along the way there are n hotels H1, . . . , Hn, at distances h1 < h2 < h3 < . . . < h(n−1) < hn from the trip’s starting point respectively. 
+The only places where the student is willing to stop for the night are these hotels, but she can choose which hotels she stops at. 
+She must stop at the final hotel Hn since this is her destination (she is planning on flying back). 
+Ideally, this student would like to travel 100Km per day, but this may not be possible, depending on the spacing of the hotels. 
+In order to determine how close the student got to this target distance, she defines the penalty for a day to be |100 − x|^1.5 where x is the distance traveled that day. 
+Her objective is to plan her trip in a way that minimizes the sum of the daily penalties over all days of the trip.
+
+[3] a. One possible solution would be to use a greedy algorithm that determines where to stop on day i by choosing the hotel whose coordinate is closest to x(i−1) + 100, where x(i−1) is the coordinate of the hotel that the student stopped at on day i − 1. 
+Give an example to show that this greedy algorithm does not always succeeds in minimizing the sum of the daily penalties over all days of the trip.
+
+x(i-1) + 100
+The greedy algorithm only minimize the immediate cost, but does not look into other (or future) hotels that would otherwise be optimal.
+
+
+A greedy algorithm would always pick the closest distance to 100. However, slightly less or more distant hotels would not be picked by a greedy algorithm
+
+
+For example, if distance to Hg is 94, and Hi is 100, and Hj is 102, the greedy algorithm would pick Hi. But the better path would have been the ones that included Hg and Hj
+         Hg  Hj 
+[ ...	][ 94    ][ 8 ][ ...	][...   ]	
+
+	Hi
+[ ...	][ 100	][ 100	][ 100]
+
+
+
+[4] b. Let Dk be the minimum sum of the daily penalties, over all possible trips that end at hotel Hk (that is, the student does not go any further). Write a recurrence relation for Dk, and explain why your recurrence relation is correct. 
+
+For hotels H0, … Hi-2, Hi-1, Hk,
+Consider all options and pick best, 
+
+D(k) = min( D(H(k-1) to Hk) 	+ abs( 100 - (hj - hk)) ^ 1.5		for 0 < j < k
+
+
+[6] c. Using this recurrence relation, describe a dynamic programming algorithm that computes Dn. Your algorithm should return the list of hotels at which the student will spend the nights to achieve the minimum sum of daily penalties (not only the value Dn). 
+
+D[0] = 0
+Parent of H1 = H0
+For all of i, from 1 to n, do:
+	D[i] = infinity
+For all of j, from 0 to i-1, do:
+	x = D[j] + abs( 100 - (hi - hj)) ^ 1.5
+	If x < D[i] {
+		D[i] = x
+		Parent[i] = Hj
+	}
+array <- some empty array
+Add j to the array, then the parent of j, then its parent, and so on, until the last parent is H0
+Return array
+		
+
+[2] d. Analyze the running time of your algorithm as a function of n.
+There are 2 for-loops in the algorithm. Hence, it will run in O(n^2)
+17] 2. Consider the following game: there is a set of letters, where each letter c is assigned a value value(c). 
+A random string S of 2^n letters is chosen, and each player will select, in turn, either the first or the last element of the string (which is then removed). 
+At the end of the game, each player computes the sum of the values of his/her letters, and the player with the largest total value wins. 
+In this question, you will design an O(n^2 ) time algorithm to compute an optimal strategy for the first player. 
+Let V [i, len] denote the maximum total value of the letters that the first player can obtain if only the letters in positions i, i + 1, . . . , i + len − 1 are left, assuming that the second player does not make any mistake (i.e., the second player follows his optimal strategy).
+
+
+(a) (5 points) Describe a recurrence relation for V [i, len]. 
+Your recurrence will need to treat the case where len is odd differently from the case where len is even, since the first player tries to maximize the sum of his own letters, while the second player tries to minimize the sum of the first player’s letters. 
+
+Let P1 = 1st Player
+Let P2 = 2nd Player
+Let Sk = k’th letter within String S
+
+	V[i, len] = 	CASE:	Len is odd: 	P1 chooses letter & tries to max total
+{ max{ V[i + 1, len-1 + value(Si)] 	V[i, len -1] + value(Sj)	}	
+
+			CASE:	Len is even:	P2 chooses letter & tries to min P1’s total
+			{ min{ V[i+1, len-1], 	V[i, len-1]	  }
+
+
+(b) (2 points) List the base cases for the recurrence from part (a) and specify the value of V for them. 
+	
+	BASE CASE:	 when len = 0
+	V[i, 0] will always be 0
+	V[1, 0], V[2, 0], …, V[2n, 0] = 0
+
+	BASE CASE: when len = 1
+V[i, 0] will always be some common value x
+	V[1, 1], V[2, 1], …, V[2n, 1] = x
+	
+
+
+
+(c) (10 points) Using your recurrence relation and your base cases, describe an O(n^2 ) time dynamic programming algorithm that computes V [1, 2n] (the total value the first player wins if the second player plays optimal strategy). How would you use table V to play the game against a player that does not necessarily follow an optimal strategy? 
+
+V[i, len] ->	V[i+1, len-1]
+		V[i, len-1]
+
+
+Algorithm:
+For each of i, 1 to 2n, do {
+	For each of i, 1 to 2n-len+1,  do {
+		If len is even:	(1st players turn)
+			Option A: Si + V[i+1, len-1]
+			Option B: S(len-1) + V[i, len-1]
+	Choose max(A and B)
+
+		If len is odd:  (2nd  players turn)
+Option A: V[i+1, len-1], 		
+				Option B:  V[i, len-1]
+				Choose min(A and B)
+	}		
+}
+
+Due to the 2 nested loops, this algorithm will run in O(n^2) time. 	
+
+It doesn’t matter if an opponent doesn’t follow an optimal strategy. 
+The first player, using the table, will always maximize his/her score regardless of how the opponent plays. 
+	
