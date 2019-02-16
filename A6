@@ -1,0 +1,183 @@
+[10] 1. Consider the E-Heavy-Hitters algorithm that we discussed in class, for streams without deletions. (So that we don’t have to worry about the time to process each element, let’s assume that the items in the stream are integers.) This algorithm processes an entire stream of length n in O(n · k) = O(n/E) time and O(1/E) space. 
+
+[5] a. Modify the algorithm so that it can process the stream of length n in O(n) = O(n) time, while still using O(1/E) space.
+
+K = (1/E) - 1
+		F[1, …, k]C[1, …, k] = new hashmap 
+		When a(t) arrives
+			If (there exists an i, such that  f[i] == a(t)),  { 
+C[i]++ }
+			Else if (# of items in hashmap < k), 
+{ f[i] = a(t), 
+c[i] = 1 }
+			Else forAll 1 <= i <= k:
+				C[i]--
+				If c[i] == 0
+					Remove f[i]
+Return f
+
+		This algorithm is in O(n)
+		These lines run in O(k) time: 
+(there exists an i, such that  f[i] == a(t)) runs in theta(n) time
+(there exists an i, such that C[i] == 0)
+forAll 1 <= i <= k:
+	
+A hashmap  structure can convert the first two lines above to theta(1) time. 
+
+	
+[5] b. Implement your new algorithm in your favorite programming language. Download the dataset at http://www.cs.ubc.ca/~nickhar/S16/Data.txt, which has one item per line of the file. Use your algorithm to find a set of nine elements containing all 1/10 -heavy-hitters. Hand in the code for your program, and the list of nine elements that it outputs.
+
+
+  // IN JAVA:
+  public static void alg() throws IOException {
+        FileReader input = new FileReader("/Users/ChampionRobert/Documents/Eclipse Projects/CPSC320A6Q1/src/Data.txt");
+        BufferedReader bufRead = new BufferedReader(input);
+        String myLine = null;
+
+        // K = (1/E) - 1
+        double E = 1/10.0;
+        double K = (1/E) - 1;
+
+        // f[1, …, k] = [null, …, null]
+        // c[1, …, k] = all 0
+        HashMap<String, Integer> hm = new HashMap();
+        // ALT:
+        String f = "";
+        int c = 0;
+
+        myLine = bufRead.readLine();
+        while ((myLine = bufRead.readLine())!= null) {
+            System.out.println("CHECKING: " + myLine);
+
+
+        	//  If (there exists an i, such that  f[i] == a(t)),
+            if (hm.containsKey(myLine)) {
+
+                //  { C[i]++ }
+                int a = hm.get(myLine);
+                hm.put(myLine, a + 1);
+                System.out.println("CASE 1");
+            }
+
+       	 	// 	Else if (there exists an i, such that C[i] == 0),
+            else if (hm.size() < K) {
+                // 		{ f[i] = a(t), c[i] = 1 }
+                hm.put(myLine, 1);
+                System.out.println("CASE 2");
+            }
+
+       		// 	Else forAll 1 <= i <= k:
+            else {
+                System.out.println("CASE 3");
+                Set<String> keySet = hm.keySet();
+                Iterator<String> keySetIterator = keySet.iterator();
+
+                while (keySetIterator.hasNext()) {
+                        // 		c[i]--
+                        String key = keySetIterator.next();
+                        hm.put(key, hm.get(key) - 1);
+
+                        //If c[i] == 0, Remove f[i]
+                        if (hm.get(key) == 0) {
+                            keySetIterator.remove();
+                        }
+                }
+            }
+        }
+
+
+List of Elements:
+
+K: #onedirection
+V: 29929
+K: #euro2016
+V: 25263
+K: #trump2016
+V: 24201
+K: #stanleycup
+V: 29565
+K: #beer
+V: 24262
+K: #iphone
+V: 24396
+K: #justinbieber
+V: 30222
+K: #beach
+V: 1
+
+[9] 2. This problem is about reductions. The textbook uses the notation Y ≤P X to denote that problem Y has a polynomial-time reduction to problem X. In other words, an arbitrary instance of problem Y can be solved using polynomially many calls to a subroutine that solves X, together with polynomially many additional computations. 
+
+Consider the following two problems, both of which we discussed in class: 
+• A: The Interval Scheduling Problem (optimizing)
+• B: The Weighted Interval Scheduling Problem (optimizing)
+• C: The Shortest Path Problem Problem (optimizing)
+• D: The Longest Path Problem Problem (optimizing)
+
+Remark: The Longest Path Problem is not discussed in the textbook, but it was mentioned in the lectures. It is an NP-complete problem. 
+(Manipulate some input given for i1, and by using a subroutine which solves i2)
+[3] a. Is it true that A ≤P B? Explain. 
+	Yes, 
+Inputs for Interval Scheduling Problems can have weights assigned such that a subset that maxes the total weight will be the same answers that Weighted Interval Scheduling problems can output. 
+
+[3] b. Is it true that B ≤P A? Explain. 
+	Yes, 
+Interval Scheduling Problem is trivial; can be ignored, and a greedy algorithm can be used to solve W.I.S. 
+Thus W.I.S. can be solved in polynomial time. 
+
+[3] c. Is it true that D ≤P C? Explain.
+	Unknown:
+The Shortest Path Problem is in P problem, 
+and the Longest-path problem is in NP-complete, 
+Depending on the argument, 
+P problems are believed to be equivalent to NP-problems (thus proving true)
+Or unequal (thus proving false)
+
+
+
+
+[10] 3. Consider the following computational problem. 
+• The CS department needs a committee to select the department’s head. The committee cannot include people who have “conflicts of interest” with each other. 
+The input consists of 
+(a) the desired committee size, 
+(b) a list of all the professors, and 
+(c) a list of all pairs of professors that are conflicted. 
+The goal is to determine whether there’s a conflict-free committee of that size.
+
+Problem: 
+Type: Dynamic Programming
+No conflicts
+Decision problem (yes/no for conflict-free committees of size k)
+
+Remarks: For this question, it is important to understand the definition of NP (in Section 8.3), and the definitions of some of the standard NP-complete problems (Vertex Cover, Set Cover, Independent Set, Hamiltonian Path, etc.) 
+
+[5] a. Prove that this problem is in NP.
+The desired certificate is:
+- a list of all professors
+- a list of all pairs of conflicting professors
+and such that:
+	- the optimized committee selection has no conflicts-of-interest among members
+Given a purported certificate, we can easily verify in polynomial time if it indeed satisfies that property. 
+To do so, we iterate for each pair combination of professors and check if a pair is conflicting (is within the conflict list). 
+The paired iteration will be as a nested for-loop and, therefore, will be in O(n^2)
+We can also use a hash to check the combinations for conflicting pairs. 
+This proves that the problem isWithin NP
+
+[5] b. Prove that this problem is NP-complete. 
+	
+	This problem can be reduced as another NP-complete problem: Independent Set.
+	Thus, 
+	Independent Set <=p this problem
+	
+	PROOF: 
+	Suppose we have a subroutine that solves “this problem”.
+	We use it to solve the Independent Set problem. 
+	
+Given a size k, the Independent Set problem will determine whether or not there is a set of k vertices with no pair of vertices with edges in between them. 
+
+We can have the set of Professors as Vertices, and all conflicting pairs of Professors as connected edges.
+	
+We then solve “this problem” and map the set of vertices as a set of committee members with size k.
+
+“This problem” will return true if there exists a set of committee members at the desired size. 
+
+	Hence, “this problem” is NP-complete
